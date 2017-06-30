@@ -46,28 +46,26 @@ namespace BackgroundTasks
                 {
                     Branding = TileBranding.NameAndLogo,
                     DisplayName = tipe, //вместо дня и даты задать ссылку на тип Bid Bidding (отобр. внизу слева)
-                    TileSmall = new TileBinding()
-                    {
-                        Branding =
-                            TileBranding
-                                .Logo, //задаем подпись и лого в нижней части плитки.//Прописать для всех размеров
-                        Content = new TileBindingContentAdaptive()
-                        {
-                            Children =
-                            {
-                                new AdaptiveText()
-                                {
-                                    Text = title,
-                                    HintWrap = true,
-                                    HintStyle = AdaptiveTextStyle.Base,
-                                    HintAlign = AdaptiveTextAlign.Center
-                                }
-                                //HintWrap отвечает за перенос текста по словам в плитке и его стиль
-                                //HintAlign - выравнивание текста
-                                //здесь добавляем текст так же как в TileWide(ниже)
-                            }
-                        }
-                    },
+                    //TileSmall = new TileBinding()
+                    //{
+                    //    Branding = TileBranding.Logo, //задаем подпись и лого в нижней части плитки.//Прописать для всех размеров
+                    //    Content = new TileBindingContentAdaptive()
+                    //    {
+                    //        Children =
+                    //        {
+                    //            new AdaptiveText()
+                    //            {
+                    //                //Text = title,
+                    //                //HintWrap = true,
+                    //                //HintStyle = AdaptiveTextStyle.Base,
+                    //                //HintAlign = AdaptiveTextAlign.Center
+                    //            }
+                    //            //HintWrap отвечает за перенос текста по словам в плитке и его стиль
+                    //            //HintAlign - выравнивание текста
+                    //            //здесь добавляем текст так же как в TileWide(ниже)
+                    //        }
+                    //    }
+                    //},
                     //Branding = TileBranding.NameAndLogo,
                     TileMedium = new TileBinding()
                     {
@@ -75,16 +73,16 @@ namespace BackgroundTasks
                         Content = new TileBindingContentAdaptive()
                         {
                             //фоновое изображение:
-                            BackgroundImage = new TileBackgroundImage()
-                            {
-                                Source = "Assets/Mostly Cloudy-Background.jpg"
-                            },
+                            //BackgroundImage = new TileBackgroundImage()
+                            //{
+                            //    Source = "Assets/Mostly Cloudy-Background.jpg"
+                            //},
                             //изображение обновляемое вместе с уведомлением. 
-                            PeekImage = new TilePeekImage()
-                            {
-                                Source = logoURL,
-                                HintOverlay = 20
-                            },
+                            //PeekImage = new TilePeekImage()
+                            //{
+                            //    Source = logoURL,
+                            //    HintOverlay = 20
+                            //},
                             Children =
                             {
                                 new AdaptiveText()
@@ -95,12 +93,13 @@ namespace BackgroundTasks
                                     HintAlign = AdaptiveTextAlign.Center
                                 },
 
-                                new AdaptiveText()
-                                {
-                                    Text = contractorName,
-                                    HintWrap = true,
-                                    HintStyle = AdaptiveTextStyle.CaptionSubtle //Утонченный шрифт с 60% прозрачностью
-                                }
+                                //new AdaptiveText()
+                                //{
+                                //    Text = contractorName,
+                                //    HintWrap = true,
+                                //    HintStyle = AdaptiveTextStyle.CaptionSubtle, //Утонченный шрифт с 60% прозрачностью
+                                //    HintAlign = AdaptiveTextAlign.Center
+                                //}
                                 //здесь добавляем текст так же как в TileWide
                             }
                         }
@@ -127,12 +126,12 @@ namespace BackgroundTasks
                                     HintStyle = AdaptiveTextStyle.CaptionSubtle //Утонченный шрифт с 60% прозрачностью
                                 },
 
-                                new AdaptiveText()
-                                {
-                                    Text = tipe,
-                                    HintWrap = true,
-                                    HintStyle = AdaptiveTextStyle.CaptionSubtle
-                                }
+                                //new AdaptiveText()
+                                //{
+                                //    Text = tipe,
+                                //    HintWrap = true,
+                                //    HintStyle = AdaptiveTextStyle.CaptionSubtle
+                                //}
                             }
                         }
                     },

@@ -9,6 +9,12 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using System.Threading.Tasks;
 using Windows.Storage;
+using Windows.UI.Xaml;
+using Windows.ApplicationModel.Core;
+using Windows.ApplicationModel;
+using Windows.Foundation;
+using Windows.UI.StartScreen;
+using Windows.UI.ViewManagement;
 
 // Документацию по шаблону элемента "Пустая страница" см. по адресу https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x419
 
@@ -22,10 +28,17 @@ namespace _25h8.business
         public MainPage()
         {
             this.InitializeComponent();
+
+            ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(200, 90));
+            ApplicationView.PreferredLaunchViewSize = new Size(200, 90);
+            ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
+
+
+
             //Application.Current.Exit(); //команда завершения работы приложенияю В теории фоновая задача 
-                                        //должна проходить регистрацию (процес на столько быстр, что без брикпоинтов пользователь 
-                                        //практически ничего не заметит) и после - завершаться. Тем не менее отдельный фоновый процесс после регистрации
-                                        //будет оставаться активным. Так же есть более эффективная альтернатива: https://docs.microsoft.com/en-us/uwp/api/Windows.ApplicationModel.Core.CoreApplication#Windows_ApplicationModel_Core_CoreApplication_EnteredBackground 
+            //должна проходить регистрацию (процес на столько быстр, что без брикпоинтов пользователь 
+            //практически ничего не заметит) и после - завершаться. Тем не менее отдельный фоновый процесс после регистрации
+            //будет оставаться активным. Так же есть более эффективная альтернатива: https://docs.microsoft.com/en-us/uwp/api/Windows.ApplicationModel.Core.CoreApplication#Windows_ApplicationModel_Core_CoreApplication_EnteredBackground 
 
         }
 
@@ -33,22 +46,53 @@ namespace _25h8.business
         //этот и ниже метод вместе с манифестом(раздел Объявления - точка входа) запускают фоновую службу. 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            RegisterBackgroundTask(taskEntryPoint, taskName);
+            
             FirstRun();
+            RegisterBackgroundTask(taskEntryPoint, taskName);
+            PinFirstTile();
+        }
+        //pin primary tile to Start if system can do it or primary tile existing
+        private async void PinFirstTile()
+        {
+            // Get your own app list entry
+            AppListEntry entry = (await Package.Current.GetAppListEntriesAsync())[0];
+            // Check if Start supports your app
+            bool isSupported = StartScreenManager.GetDefault().SupportsAppListEntry(entry);
+            if (isSupported)
+            {
+                // And pin it to Start
+                bool isPinned = await StartScreenManager.GetDefault().RequestAddAppListEntryAsync(entry);
+            }
+            //эту часть еще нужно править, если получится
+            // The URI to launch
+            var baseUri = new Uri(@"https://stage.25h8.business/#!/landing");
+
+            // Launch the URI
+            var success = await Windows.System.Launcher.LaunchUriAsync(baseUri);
+
+            if (success)
+            {
+                // URI launched
+            }
+            else
+            {
+                // URI launch failed
+            }
+            Application.Current.Exit();
         }
 
-        private async void FirstRun()
+        private void FirstRun()
         {
             if (File.Exists(PathFolder) == false)
             {
-                BackgroundTasks.RunClass.FirstGetJsonAsync();
-                
-                var biddingSearchResults = BackgroundTasks.RunClass.ReadJson();
+                //BackgroundTasks.RunClass.FirstGetJsonAsync();
+                string jsonText = BackgroundTasks.RunClass.GetAndSaveJson();
+                var biddingSearchResults = BackgroundTasks.RunClass.ReadJson(jsonText);
 
-                // Update the live tile with the feed items.
                 var tileUpdater = new BackgroundTasks.TileUpdater();
                 tileUpdater.UpdateTile(biddingSearchResults);
             }
+            
         }
         //
         // Register a background task with the specified taskEntryPoint, name, trigger,
@@ -90,7 +134,7 @@ namespace _25h8.business
             builder.SetTrigger(new TimeTrigger(30, false));
 
             BackgroundTaskRegistration task = builder.Register();
-
+            
             return task;
         }
         static readonly StorageFolder GetLocalFolder = ApplicationData.Current.LocalFolder;

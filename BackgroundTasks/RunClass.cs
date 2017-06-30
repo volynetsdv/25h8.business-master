@@ -35,22 +35,22 @@ namespace BackgroundTasks
         //использован следующий пример: https://docs.microsoft.com/ru-ru/windows/uwp/launch-resume/update-a-live-tile-from-a-background-task
 
         static string feedUrl = @"https://stage.bankfund.sale/api/search?index=trade&limit=10&offset=0&populate=owner&project=MAIN";
-        BackgroundTaskDeferral _deferral;
+        //BackgroundTaskDeferral _deferral;
         //здесь начинается выполнение фоновой задачи
-        public async void Run(IBackgroundTaskInstance taskInstance)
+        public void Run(IBackgroundTaskInstance taskInstance)
         {
             // Get a deferral, to prevent the task from closing prematurely
             // while asynchronous code is still running.
             BackgroundTaskDeferral deferral = taskInstance.GetDeferral();
 
-            _deferral = taskInstance.GetDeferral();//начало задержки перед асинхронной задачей
+            //_deferral = taskInstance.GetDeferral();//начало задержки перед асинхронной задачей
             // Download the and save JSON to file.
-            await GetJson();
-            _deferral.Complete();//конец задержки. Предотвращает неожиданную остановку фоновой 
+            string jsonText = GetAndSaveJson();
+            //_deferral.Complete();//конец задержки. Предотвращает неожиданную остановку фоновой 
             //задачи в которой используются асинхронные методы
 
             //Read data from JSON file
-            var biddingSearchResults = ReadJson();
+            var biddingSearchResults = ReadJson(jsonText);
 
             // Update the live tile with the feed items.
             var tileUpdater = new TileUpdater();
@@ -67,12 +67,8 @@ namespace BackgroundTasks
 
         //получаем ответ от JSON в виде строки и сохраняем в файл data.json
         //вынуждены использовать HttpBaseProtocolFilter для получения данных от не защищенного АПИ (отсувствует сертификат SSL)
-        public static void FirstGetJsonAsync()
-        {
-            GetJson();
-        }
 
-        internal static async Task GetJson()
+        public static string GetAndSaveJson()
         {
             try
             {
@@ -85,9 +81,9 @@ namespace BackgroundTasks
 #endif
                 using (var httpClient = new HttpClient(filter))
                 {
-                    HttpResponseMessage response = await httpClient.GetAsync(new Uri(feedUrl));
-                    
-                    var httpSerialize = await response.Content.ReadAsStringAsync();
+                    HttpResponseMessage response = httpClient.GetAsync(new Uri(feedUrl)).GetAwaiter().GetResult();
+
+                    var httpSerialize = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                     var parsedString = Regex.Unescape(httpSerialize);
                     byte[] isoBites = Encoding.GetEncoding("ISO-8859-1").GetBytes(parsedString);
                     var jsonText = Encoding.UTF8.GetString(isoBites, 0, isoBites.Length);
@@ -104,24 +100,32 @@ namespace BackgroundTasks
                             deleteTask.Wait(timeout);
                         }
                         File.WriteAllText(PathFolder, jsonText);
+                        return jsonText;
                     }
                 }
             }
-
+            
             catch (Exception)
             {
-                Task.Delay(TimeSpan.FromSeconds(5)).Wait();
-                await GetJson();
+                return null;
             }
-
+            return null; //это нужно, если ни try ни catche не отработали?
         }
 
         // Проводим дессериализацию
         // Дессериализация выполняется по следующему примеру: 
         //http://www.newtonsoft.com/json/help/html/SerializingJSONFragments.htm#
-        public static IList<Bidding> ReadJson()
+        public static IList<Bidding> ReadJson(string jsonText)
         {
-            var json = JObject.Parse(File.ReadAllText(PathFolder));
+            JObject json;
+            if (jsonText == null)
+            {
+                json = JObject.Parse(File.ReadAllText(PathFolder));
+            }
+            else
+            {
+                json = JObject.Parse(jsonText);
+            }
             // собираем JSON resultList objects в список объектов
             var resultList = json["result"].Children().ToList();
 
