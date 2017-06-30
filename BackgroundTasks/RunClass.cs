@@ -35,21 +35,18 @@ namespace BackgroundTasks
         //использован следующий пример: https://docs.microsoft.com/ru-ru/windows/uwp/launch-resume/update-a-live-tile-from-a-background-task
 
         static string feedUrl = @"https://stage.bankfund.sale/api/search?index=trade&limit=10&offset=0&populate=owner&project=MAIN";
-        //BackgroundTaskDeferral _deferral;
+
         //здесь начинается выполнение фоновой задачи
         public void Run(IBackgroundTaskInstance taskInstance)
         {
             // Get a deferral, to prevent the task from closing prematurely
             // while asynchronous code is still running.
             BackgroundTaskDeferral deferral = taskInstance.GetDeferral();
-
-            //_deferral = taskInstance.GetDeferral();//начало задержки перед асинхронной задачей
+          
             // Download the and save JSON to file.
             string jsonText = GetAndSaveJson();
-            //_deferral.Complete();//конец задержки. Предотвращает неожиданную остановку фоновой 
-            //задачи в которой используются асинхронные методы
-
-            //Read data from JSON file
+         
+            //Desserealize JSON 
             var biddingSearchResults = ReadJson(jsonText);
 
             // Update the live tile with the feed items.
@@ -64,10 +61,6 @@ namespace BackgroundTasks
 
         //получаем ответ от JSON в виде строки и сохраняем в файл data.json
         //вынуждены использовать HttpBaseProtocolFilter для получения данных от не защищенного АПИ (отсувствует сертификат SSL)
-
-        //получаем ответ от JSON в виде строки и сохраняем в файл data.json
-        //вынуждены использовать HttpBaseProtocolFilter для получения данных от не защищенного АПИ (отсувствует сертификат SSL)
-
         public static string GetAndSaveJson()
         {
             try
@@ -113,8 +106,6 @@ namespace BackgroundTasks
         }
 
         // Проводим дессериализацию
-        // Дессериализация выполняется по следующему примеру: 
-        //http://www.newtonsoft.com/json/help/html/SerializingJSONFragments.htm#
         public static IList<Bidding> ReadJson(string jsonText)
         {
             JObject json;
@@ -141,7 +132,7 @@ namespace BackgroundTasks
                     searchResult.EntityType = searchResult.EntityType.Equals("bid") ? "Заявка" : "аукцион\\редукцион";
                     biddingSearchResults.Add(searchResult);
                 }
-                catch (Exception) //на 3-й итерации цикла приходит пустой "owner", что вызывает ошибку
+                catch (Exception) //на 3-й итерации цикла приходит пустой "owner", что вызывает ошибку. Пропускаем итерацию с ошибкой. Это нормально
                 {
                     continue;
                 }
@@ -160,7 +151,7 @@ namespace BackgroundTasks
         }
 
         static readonly StorageFolder GetLocalFolder = ApplicationData.Current.LocalFolder;
-        static readonly string PathFolder = Path.Combine(GetLocalFolder.Path, "data.json"); //адрес файла в "title.xml" в системе
+        static readonly string PathFolder = Path.Combine(GetLocalFolder.Path, "data.json"); 
 
     }
 }

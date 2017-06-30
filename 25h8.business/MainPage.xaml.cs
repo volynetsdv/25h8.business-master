@@ -63,6 +63,7 @@ namespace _25h8.business
                 // And pin it to Start
                 bool isPinned = await StartScreenManager.GetDefault().RequestAddAppListEntryAsync(entry);
             }
+            await Task.Delay(1500);
             //эту часть еще нужно править, если получится
             // The URI to launch
             var baseUri = new Uri(@"https://stage.25h8.business/#!/landing");

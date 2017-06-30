@@ -23,7 +23,7 @@ namespace BackgroundTasks
             // Create a tile update manager 
             var updater = TileUpdateManager.CreateTileUpdaterForApplication();
             updater.EnableNotificationQueue(true);
-            updater.Clear();  //судя по прочтенной информации - нам не нужно будет очищать плитку, но на всякий случай не удаляю          
+            updater.Clear();            
 
             for (int i = 0; i < biddingSearchResults.Count; i++)
             {
@@ -37,7 +37,7 @@ namespace BackgroundTasks
                 updater.Update(notification);
             }
         }
-
+        //данная структура задает правила отображения информации на плитках различных размеров:
         private TileContent GetTileContent(string title, string contractorName, string logoURL, string tipe)
         {
             return new TileContent()
@@ -45,93 +45,97 @@ namespace BackgroundTasks
                 Visual = new TileVisual()
                 {
                     Branding = TileBranding.NameAndLogo,
-                    DisplayName = tipe, //вместо дня и даты задать ссылку на тип Bid Bidding (отобр. внизу слева)
-                    //TileSmall = new TileBinding()
-                    //{
-                    //    Branding = TileBranding.Logo, //задаем подпись и лого в нижней части плитки.//Прописать для всех размеров
-                    //    Content = new TileBindingContentAdaptive()
-                    //    {
-                    //        Children =
-                    //        {
-                    //            new AdaptiveText()
-                    //            {
-                    //                //Text = title,
-                    //                //HintWrap = true,
-                    //                //HintStyle = AdaptiveTextStyle.Base,
-                    //                //HintAlign = AdaptiveTextAlign.Center
-                    //            }
-                    //            //HintWrap отвечает за перенос текста по словам в плитке и его стиль
-                    //            //HintAlign - выравнивание текста
-                    //            //здесь добавляем текст так же как в TileWide(ниже)
-                    //        }
-                    //    }
-                    //},
-                    //Branding = TileBranding.NameAndLogo,
+                    //Есть два варианта средней плитки
+                    //вариант №1:
+                    DisplayName = tipe, 
                     TileMedium = new TileBinding()
                     {
-                        DisplayName = tipe,
                         Content = new TileBindingContentAdaptive()
                         {
-                            //фоновое изображение:
-                            //BackgroundImage = new TileBackgroundImage()
-                            //{
-                            //    Source = "Assets/Mostly Cloudy-Background.jpg"
-                            //},
-                            //изображение обновляемое вместе с уведомлением. 
-                            //PeekImage = new TilePeekImage()
-                            //{
-                            //    Source = logoURL,
-                            //    HintOverlay = 20
-                            //},
+                            PeekImage = new TilePeekImage()
+                            {
+                                Source = logoURL,
+                                HintOverlay = 20
+                            },
                             Children =
                             {
                                 new AdaptiveText()
                                 {
                                     Text = title,
                                     HintWrap = true,
-                                    HintStyle = AdaptiveTextStyle.Base,
-                                    HintAlign = AdaptiveTextAlign.Center
                                 },
-
-                                //new AdaptiveText()
-                                //{
-                                //    Text = contractorName,
-                                //    HintWrap = true,
-                                //    HintStyle = AdaptiveTextStyle.CaptionSubtle, //Утонченный шрифт с 60% прозрачностью
-                                //    HintAlign = AdaptiveTextAlign.Center
-                                //}
-                                //здесь добавляем текст так же как в TileWide
+                                new AdaptiveText()
+                                {
+                                    Text = contractorName,
+                                    HintStyle = AdaptiveTextStyle.CaptionSubtle,
+                                    HintWrap = true
+                                }
                             }
                         }
+                        //Вариант №2:
+                        //DisplayName = tipe,
+                        //Content = new TileBindingContentAdaptive()
+                        //{
+                        //    Children =
+                        //    {
+                        //        new AdaptiveText()
+                        //        {
+                        //            Text = title,
+                        //            HintWrap = true,
+                        //            HintStyle = AdaptiveTextStyle.Base,
+                        //            HintAlign = AdaptiveTextAlign.Center
+                        //        }
+                        //    }
+                        //}
                     },
 
                     TileWide = new TileBinding()
                     {
-                        DisplayName = tipe,
+                        Branding = TileBranding.NameAndLogo,
                         Content = new TileBindingContentAdaptive()
                         {
                             Children =
                             {
-                                new AdaptiveText()
+                                new AdaptiveGroup()
                                 {
-                                    Text = title,
-                                    HintWrap = true,
-                                    HintStyle = AdaptiveTextStyle.Subtitle
-                                },
-
-                                new AdaptiveText()
-                                {
-                                    Text = contractorName,
-                                    HintWrap = true,
-                                    HintStyle = AdaptiveTextStyle.CaptionSubtle //Утонченный шрифт с 60% прозрачностью
-                                },
-
-                                //new AdaptiveText()
-                                //{
-                                //    Text = tipe,
-                                //    HintWrap = true,
-                                //    HintStyle = AdaptiveTextStyle.CaptionSubtle
-                                //}
+                                    Children =
+                                    {
+                                        // Image column
+                                        new AdaptiveSubgroup()
+                                        {
+                                            HintWeight = 33,
+                                            Children =
+                                            {
+                                                new AdaptiveImage()
+                                                {
+                                                    Source = logoURL,
+                                                    HintCrop = AdaptiveImageCrop.Circle
+                                                }
+                                            }
+                                        },
+                                        // Text column
+                                        new AdaptiveSubgroup()
+                                        {
+                                            // Vertical align its contents
+                                            //TextStacking = TileTextStacking.Center,
+                                            Children =
+                                            {
+                                                new AdaptiveText()
+                                                {
+                                                    Text = title,
+                                                    HintWrap = true,
+                                                    HintStyle = AdaptiveTextStyle.Subtitle
+                                                },
+                                                new AdaptiveText()
+                                                {
+                                                    Text = contractorName,
+                                                    HintWrap = true,
+                                                    HintStyle = AdaptiveTextStyle.BodySubtle
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     },
@@ -141,6 +145,10 @@ namespace BackgroundTasks
                         DisplayName = tipe,
                         Content = new TileBindingContentAdaptive()
                         {
+                            //BackgroundImage = new TileBackgroundImage()
+                            //{
+                            //    Source = "Assets/TileBackground.png"
+                            //},
                             TextStacking = TileTextStacking.Center,
                             Children =
                             {
@@ -167,12 +175,14 @@ namespace BackgroundTasks
                                 new AdaptiveText()
                                 {
                                     Text = title,
+                                    HintWrap = true,
                                     HintStyle = AdaptiveTextStyle.Title,
                                     HintAlign = AdaptiveTextAlign.Center
                                 },
                                 new AdaptiveText()
                                 {
                                     Text = contractorName,
+                                    HintWrap = true,
                                     HintStyle = AdaptiveTextStyle.SubtitleSubtle,
                                     HintAlign = AdaptiveTextAlign.Center
                                 }
