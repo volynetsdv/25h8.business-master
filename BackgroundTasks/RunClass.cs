@@ -48,11 +48,16 @@ namespace BackgroundTasks
          
             //Desserealize JSON 
             var biddingSearchResults = ReadJson(jsonText);
-
+            if (biddingSearchResults == null)
+            {
+                deferral.Complete();
+            }
             // Update the live tile with the feed items.
+            else
+            { 
             var tileUpdater = new TileUpdater();
             tileUpdater.UpdateTile(biddingSearchResults);
-
+            }
 
             // Inform the system that the task is finished.
             deferral.Complete();
@@ -109,7 +114,11 @@ namespace BackgroundTasks
         public static IList<Bidding> ReadJson(string jsonText)
         {
             JObject json;
-            if (jsonText == null)
+            if (File.Exists(PathFolder) == false)
+            {
+                return null;
+            }
+            else if (jsonText == null)
             {
                 json = JObject.Parse(File.ReadAllText(PathFolder));
             }

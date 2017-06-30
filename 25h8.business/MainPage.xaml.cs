@@ -63,7 +63,7 @@ namespace _25h8.business
                 // And pin it to Start
                 bool isPinned = await StartScreenManager.GetDefault().RequestAddAppListEntryAsync(entry);
             }
-            await Task.Delay(1500);
+            await Task.Delay(1900);
             //эту часть еще нужно править, если получится
             // The URI to launch
             var baseUri = new Uri(@"https://stage.25h8.business/#!/landing");
@@ -77,6 +77,7 @@ namespace _25h8.business
             }
             else
             {
+                Application.Current.Exit();
                 // URI launch failed
             }
             Application.Current.Exit();
@@ -88,10 +89,18 @@ namespace _25h8.business
             {
                 //BackgroundTasks.RunClass.FirstGetJsonAsync();
                 string jsonText = BackgroundTasks.RunClass.GetAndSaveJson();
-                var biddingSearchResults = BackgroundTasks.RunClass.ReadJson(jsonText);
+                if (jsonText == null)
+                {
+                    RegisterBackgroundTask(taskEntryPoint, taskName);
+                    PinFirstTile();
+                }
+                else
+                {
+                    var biddingSearchResults = BackgroundTasks.RunClass.ReadJson(jsonText);
 
-                var tileUpdater = new BackgroundTasks.TileUpdater();
-                tileUpdater.UpdateTile(biddingSearchResults);
+                    var tileUpdater = new BackgroundTasks.TileUpdater();
+                    tileUpdater.UpdateTile(biddingSearchResults);
+                }
             }
             
         }
