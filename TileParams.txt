@@ -1,0 +1,119 @@
+TileContent content = new TileContent()
+{
+    Visual = new TileVisual()
+    {
+	Branding = TileBranding.Logo,
+	//DisplayName = "Wednesday 22", //вместо дня и даты задать ссылку на тип Bid Bidding (отобр. внизу слева)
+        TileSmall = new TileBinding()
+        {
+		//{		//задаем подпись и лого в нижней части плитки. 
+				//Прописать для всех размеров
+            	//Branding = TileBranding.Logo,
+            	//...
+       		//},
+            Content = new TileBindingContentAdaptive()
+            {
+                Children =
+                {
+                    new AdaptiveText() { Text = "Small",
+			HintWrap = AdaptiveTextStyle.Base,
+    			HintAlign = AdaptiveTextAlign.Center }
+			//HintWrap отвечает за перенос текста по словам в плитке и его стиль
+			//HintAlign - выравнивание текста
+		//здесь добавляем текст так же как в TileWide(ниже)
+                }
+            }
+        },
+	Branding = TileBranding.NameAndLogo,
+        TileMedium = new TileBinding()
+        {
+            Content = new TileBindingContentAdaptive()
+            {
+		//фоновое изображение:
+		BackgroundImage = new TileBackgroundImage()
+        	{
+            		Source = "Assets/Mostly Cloudy-Background.jpg"
+        	},
+		//изображение обновляемое вместе с уведомлением. 
+        	PeekImage = new TilePeekImage()
+        	{
+            		Source = "Assets/Map.jpg",
+            		HintOverlay = 20
+        	},
+                Children =
+                {
+                    new AdaptiveText() { Text = "Medium" }
+		//здесь добавляем текст так же как в TileWide
+                }
+            }
+        },
+
+        TileWide = new TileBinding()
+        {
+            Content = new TileBindingContentAdaptive()
+            {
+                Children =
+                {
+                    new AdaptiveText()
+                    {
+                        Text = "Jennifer Parker",
+                        HintStyle = AdaptiveTextStyle.Subtitle
+                    },
+
+                    new AdaptiveText()
+                    {
+                        Text = "Photos from our trip",
+                        HintStyle = AdaptiveTextStyle.CaptionSubtle//Утонченный шрифт с 60% прозрачностью
+                    },
+
+                    new AdaptiveText()
+                    {
+                        Text = "Check out these awesome photos I took while in New Zealand!",
+                        HintStyle = AdaptiveTextStyle.CaptionSubtle
+                    }
+                }
+            }
+        },
+	//большая плитка
+        TileLarge = new TileBinding()
+        {
+            Content = new TileBindingContentAdaptive()
+            {
+                new AdaptiveGroup()
+            {
+
+                Children =
+                {
+                    new AdaptiveSubgroup() { HintWeight = 1 },
+                    new AdaptiveSubgroup()
+                    {
+                        HintWeight = 2,
+                        Children =
+                        {
+                            new AdaptiveImage()
+                            {
+                                Source = "Assets/Apps/Hipstame/hipster.jpg",
+                                HintCrop = AdaptiveImageCrop.Circle
+                            }//прямую сслку заменить на элемент овнер объекта
+                        }
+                    },
+                    new AdaptiveSubgroup() { HintWeight = 1 }
+                }
+            },
+            new AdaptiveText()
+            {
+                Text = "Hi,",
+                HintStyle = AdaptiveTextStyle.Title,
+                HintAlign = AdaptiveTextAlign.Center
+            },//текст заменить на элемент тайтл объекта
+            new AdaptiveText()
+            {
+                Text = "MasterHip",
+                HintStyle = AdaptiveTextStyle.SubtitleSubtle,
+                HintAlign = AdaptiveTextAlign.Center
+            }//текст заменить на элемент овнер объекта
+        }
+            }
+        }
+    }
+};
