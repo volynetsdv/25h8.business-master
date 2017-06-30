@@ -31,14 +31,15 @@ namespace BackgroundTasks
                 var contractorName = biddingSearchResults[i].Owner.ContractorName;
                 var logoURL = biddingSearchResults[i].Owner.LogoURL;
                 var tipe = biddingSearchResults[i].EntityType;
+                var background = biddingSearchResults[i].Owner.BackgroundForTile;
                 //этот код отправляет уведомление на политку используя содержимое из "content":
-                var content = GetTileContent(title, contractorName, logoURL, tipe);
+                var content = GetTileContent(title, contractorName, logoURL, tipe, background);
                 var notification = new TileNotification(content.GetXml());
                 updater.Update(notification);
             }
         }
         //данная структура задает правила отображения информации на плитках различных размеров:
-        private TileContent GetTileContent(string title, string contractorName, string logoURL, string tipe)
+        private TileContent GetTileContent(string title, string contractorName, string logoURL, string tipe, string background)
         {
             return new TileContent()
             {
@@ -52,6 +53,10 @@ namespace BackgroundTasks
                     {
                         Content = new TileBindingContentAdaptive()
                         {
+                            BackgroundImage = new TileBackgroundImage()//Проверить
+                            {
+                                Source = background
+                            },
                             PeekImage = new TilePeekImage()
                             {
                                 Source = logoURL,
@@ -76,6 +81,10 @@ namespace BackgroundTasks
                         //DisplayName = tipe,
                         //Content = new TileBindingContentAdaptive()
                         //{
+                        //    BackgroundImage = new TileBackgroundImage()//Проверить
+                        //    {
+                        //    Source = background
+                        //},
                         //    Children =
                         //    {
                         //        new AdaptiveText()
@@ -94,6 +103,10 @@ namespace BackgroundTasks
                         Branding = TileBranding.NameAndLogo,
                         Content = new TileBindingContentAdaptive()
                         {
+                            BackgroundImage = new TileBackgroundImage()
+                            {
+                                Source = background
+                            },
                             Children =
                             {
                                 new AdaptiveGroup()
@@ -145,10 +158,10 @@ namespace BackgroundTasks
                         DisplayName = tipe,
                         Content = new TileBindingContentAdaptive()
                         {
-                            //BackgroundImage = new TileBackgroundImage()
-                            //{
-                            //    Source = "Assets/TileBackground.png"
-                            //},
+                            BackgroundImage = new TileBackgroundImage()
+                            {
+                                Source = background
+                            },
                             TextStacking = TileTextStacking.Center,
                             Children =
                             {

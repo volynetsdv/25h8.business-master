@@ -13,14 +13,17 @@ namespace BackgroundTasks
         [JsonProperty(PropertyName = "contractorAvatarUrl")]
         public string LogoURL { get; set; }
 
-
+        [JsonProperty(PropertyName = "coverFileUrl")]
+        public string BackgroundForTile { get; set; }
+        
 
         public Owner() { }
 
-        public Owner(string contractorName, string logoURL)
+        public Owner(string contractorName, string logoURL, string backgroundForTile)
         {
             ContractorName = contractorName;
             LogoURL = logoURL;
+            BackgroundForTile = backgroundForTile;
         }
 
     }
