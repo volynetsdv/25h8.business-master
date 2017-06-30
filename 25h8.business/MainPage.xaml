@@ -7,9 +7,10 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        
-            
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" VerticalAlignment="Center" HorizontalAlignment="Center">
+        <TextBlock HorizontalAlignment="Center" Margin="0" TextWrapping="Wrap" Text="Please wait..." VerticalAlignment="Center" FontSize="24"/>
+
+
 
     </Grid>
 </Page>

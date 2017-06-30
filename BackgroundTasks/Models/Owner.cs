@@ -13,6 +13,8 @@ namespace BackgroundTasks
         [JsonProperty(PropertyName = "contractorAvatarUrl")]
         public string LogoURL { get; set; }
 
+
+
         public Owner() { }
 
         public Owner(string contractorName, string logoURL)
