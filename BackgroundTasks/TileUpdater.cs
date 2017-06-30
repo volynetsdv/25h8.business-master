@@ -31,7 +31,12 @@ namespace BackgroundTasks
                 var contractorName = biddingSearchResults[i].Owner.ContractorName;
                 var logoURL = biddingSearchResults[i].Owner.LogoURL;
                 var tipe = biddingSearchResults[i].EntityType;
+                var defaultBackground = @"Assets\DefaultTileBackground.png";
                 var background = biddingSearchResults[i].Owner.BackgroundForTile;
+                if (background == "")
+                {
+                    background = defaultBackground;
+                }
                 //этот код отправляет уведомление на политку используя содержимое из "content":
                 var content = GetTileContent(title, contractorName, logoURL, tipe, background);
                 var notification = new TileNotification(content.GetXml());
@@ -137,7 +142,7 @@ namespace BackgroundTasks
                                                 {
                                                     Text = title,
                                                     HintWrap = true,
-                                                    HintStyle = AdaptiveTextStyle.Subtitle
+                                                    HintStyle = AdaptiveTextStyle.Base
                                                 },
                                                 new AdaptiveText()
                                                 {
@@ -189,14 +194,14 @@ namespace BackgroundTasks
                                 {
                                     Text = title,
                                     HintWrap = true,
-                                    HintStyle = AdaptiveTextStyle.Title,
+                                    HintStyle = AdaptiveTextStyle.Subtitle,
                                     HintAlign = AdaptiveTextAlign.Center
                                 },
                                 new AdaptiveText()
                                 {
                                     Text = contractorName,
                                     HintWrap = true,
-                                    HintStyle = AdaptiveTextStyle.SubtitleSubtle,
+                                    HintStyle = AdaptiveTextStyle.BaseSubtle,//SubtitleSubtle,
                                     HintAlign = AdaptiveTextAlign.Center
                                 }
                             }
@@ -210,13 +215,5 @@ namespace BackgroundTasks
 
 
 
-//В метод нужно добавить перебор тайтлов,но для начала 
-//хочу добиться вывода на плитку хотя бы первого значения. Дальше все будет 
+
 //с реализацией сильно поможет статья для Вин8: https://habrahabr.ru/post/149219/
-
-
-// Although most HTTP servers do not require User-Agent header, others will reject the request or return
-// a different response if this header is missing. Use SetRequestHeader() to add custom headers.
-//static string customHeaderName = "User-Agent";
-//static string customHeaderValue = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0";
-

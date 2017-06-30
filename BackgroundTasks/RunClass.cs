@@ -116,15 +116,15 @@ namespace BackgroundTasks
             JObject json;
             if (File.Exists(PathFolder) == false)
             {
-                return null;
+                return null; //если файла не существует - значит это первый запуск приложения и мы не смогли вытянуть данные с апи. Нет смысла продолжать. иначе - идем дальше 
             }
             else if (jsonText == null)
             {
-                json = JObject.Parse(File.ReadAllText(PathFolder));
+                json = JObject.Parse(File.ReadAllText(PathFolder)); //мы уже знаем, что файл существует и если нам пришла пустая строка - значит нет соединения и нужно прочесть старые данные из файла. Иначе - идем дальше
             }
             else
             {
-                json = JObject.Parse(jsonText);
+                json = JObject.Parse(jsonText); //если мі дошли сюда - мы знаем, что запрос был успешным и работаем с данными, которые нам передал предыдущий метод
             }
             // собираем JSON resultList objects в список объектов
             var resultList = json["result"].Children().ToList();
@@ -138,7 +138,7 @@ namespace BackgroundTasks
                     var searchResult = res.ToObject<Bidding>();
                     if (searchResult.Title == null)
                     { continue; }
-                    searchResult.EntityType = searchResult.EntityType.Equals("bid") ? "Заявка" : "аукцион\\редукцион";
+                    searchResult.EntityType = searchResult.EntityType.Equals("bid") ? "Заявка" : @"аукцион/редукцион";
                     biddingSearchResults.Add(searchResult);
                 }
                 catch (Exception) //на 3-й итерации цикла приходит пустой "owner", что вызывает ошибку. Пропускаем итерацию с ошибкой. Это нормально
