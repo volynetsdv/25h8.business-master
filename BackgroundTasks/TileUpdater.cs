@@ -1,13 +1,6 @@
-﻿using System;
-using Microsoft.Toolkit.Uwp.Notifications;
-using System.Diagnostics;
-using System.IO;
-using System.Xml.Serialization;
-using Windows.Data.Xml.Dom;
-using Windows.Storage;
+﻿using Microsoft.Toolkit.Uwp.Notifications;
 using Windows.UI.Notifications;
 using System.Collections.Generic;
-//using NotificationsExtensions.Tiles;
 
 namespace BackgroundTasks
 {
@@ -29,8 +22,13 @@ namespace BackgroundTasks
             {
                 var title = biddingSearchResults[i].Title;
                 var contractorName = biddingSearchResults[i].Owner.ContractorName;
-                var logoURL = biddingSearchResults[i].Owner.LogoURL;
                 var tipe = biddingSearchResults[i].EntityType;
+                var ownerIcon = biddingSearchResults[i].Owner.OwnerIcon;
+                var defaultOwnerIcon = @"Assets\owner-icon.png";
+                if (ownerIcon == "")
+                {
+                    ownerIcon = defaultOwnerIcon;
+                }
                 var defaultBackground = @"Assets\DefaultTileBackground.png";
                 var background = biddingSearchResults[i].Owner.BackgroundForTile;
                 if (background == "")
@@ -38,7 +36,7 @@ namespace BackgroundTasks
                     background = defaultBackground;
                 }
                 //этот код отправляет уведомление на политку используя содержимое из "content":
-                var content = GetTileContent(title, contractorName, logoURL, tipe, background);
+                var content = GetTileContent(title, contractorName, ownerIcon, tipe, background);
                 var notification = new TileNotification(content.GetXml());
                 updater.Update(notification);
             }

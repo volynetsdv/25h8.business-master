@@ -1,31 +1,16 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Concurrent;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net.Security;
 using Windows.Web.Http;
-//using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Serialization;
 using Windows.ApplicationModel.Background;
-using Windows.Data.Xml.Dom;
 using Windows.Storage;
-using Windows.UI.Notifications;
-using Windows.System.Threading;
 using Newtonsoft.Json.Linq;
-using System.Net.Http.Headers;
-using System.Security.Cryptography.X509Certificates;
 using Windows.Web.Http.Filters;
 using Windows.Security.Cryptography.Certificates;
 using System.Text.RegularExpressions;
-using System.Collections;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Runtime.Serialization.Formatters;
-using Windows.Foundation;
 
 namespace BackgroundTasks
 {
@@ -124,13 +109,13 @@ namespace BackgroundTasks
             }
             else
             {
-                json = JObject.Parse(jsonText); //если мі дошли сюда - мы знаем, что запрос был успешным и работаем с данными, которые нам передал предыдущий метод
+                json = JObject.Parse(jsonText); //если мы дошли сюда - мы знаем, что запрос был успешным и работаем с данными, которые нам передал предыдущий метод
             }
-            // собираем JSON resultList objects в список объектов
+            // собираем JSON objects в список объектов resultList
             var resultList = json["result"].Children().ToList();
 
-            var biddingSearchResults = new List<Bidding>();//результат работы цикла
-
+            var biddingSearchResults = new List<Bidding>();
+            //цикл приводит список объектов из resultList в список объектов biddingSearchResults. Таким образом - мы получаем список объектов не содержащий лишних данных
             foreach (var res in resultList)
             {
                 try

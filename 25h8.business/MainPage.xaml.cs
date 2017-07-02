@@ -2,10 +2,6 @@
 using System.IO;
 using Windows.UI.Xaml.Controls;
 using Windows.ApplicationModel.Background;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -29,8 +25,8 @@ namespace _25h8.business
         {
             this.InitializeComponent();
 
-            ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(200, 90));
-            ApplicationView.PreferredLaunchViewSize = new Size(200, 90);
+            ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(300, 130));
+            ApplicationView.PreferredLaunchViewSize = new Size(300, 130);
             ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
 
 
@@ -51,6 +47,16 @@ namespace _25h8.business
             RegisterBackgroundTask(taskEntryPoint, taskName);
             PinFirstTile();
         }
+
+        public async Task<bool> GoToLanding()
+        {
+            DisplayResult.Text = "Перенаправляю на сайт...";
+            await Task.Delay(1900);
+            // Launch the URI            
+            var success = await Windows.System.Launcher.LaunchUriAsync(LandingUri);
+            return success;
+
+        }
         //pin primary tile to Start if system can do it or primary tile existing
         private async void PinFirstTile()
         {
@@ -58,30 +64,59 @@ namespace _25h8.business
             AppListEntry entry = (await Package.Current.GetAppListEntriesAsync())[0];
             // Check if Start supports your app
             bool isSupported = StartScreenManager.GetDefault().SupportsAppListEntry(entry);
-            if (isSupported)
-            {
-                // And pin it to Start
-                bool isPinned = await StartScreenManager.GetDefault().RequestAddAppListEntryAsync(entry);
-            }
+            //проверяем закреплена ли плитка
+            bool isPinned = await StartScreenManager.GetDefault().ContainsAppListEntryAsync(entry);
+        //если да - перейти на сайт
 
-            await Task.Delay(1900);
-            //эту часть еще нужно править, если получится
-            // The URI to launch
-            var baseUri = new Uri(@"https://stage.25h8.business/#!/landing");
-
-            // Launch the URI
-            var success = await Windows.System.Launcher.LaunchUriAsync(baseUri);
-
+        if (isPinned)
+        {
+            var success = await GoToLanding();
             if (success)
             {
                 // URI launched
             }
             else
             {
+                DisplayResult.Text = "Проверьте соединение";
+                await Task.Delay(1400);
                 Application.Current.Exit();
                 // URI launch failed
             }
-            Application.Current.Exit();
+                Application.Current.Exit();
+        }
+        //если нет и поддерживается програмное закрепление плитки - спросить пользователя
+            if (isSupported)
+            {
+                // And pin it to Start
+                bool pinnIfExist = await StartScreenManager.GetDefault().RequestAddAppListEntryAsync(entry);
+
+                DisplayResult.Text = "Плитка успешно закреплена в меню Пуск";
+                await Task.Delay(1900);
+                Application.Current.Exit();
+            }
+            else
+            {
+                //добавить условие else, то есть, "если програмное закреполение не поддерживается"
+                //вывести сообщение "Пожалуйста, закрепите плитку в меню Пуск"
+                //временная заглушка:
+                DisplayResult.Text = "Пожалуйста, закрепите плитку в меню Пуск";
+                await Task.Delay(1500);
+                DisplayResult.Text = "Перенаправляю на сайт";
+                var success = await GoToLanding();
+                if (success)
+                {
+                    // URI launched
+                }
+                else
+                {
+                    DisplayResult.Text = "Проверьте соединение";
+                    await Task.Delay(1400);
+                    Application.Current.Exit();
+                    // URI launch failed
+                }
+                Application.Current.Exit();
+            }
+
         }
 
         private void FirstRun()
@@ -89,7 +124,7 @@ namespace _25h8.business
             if (File.Exists(PathFolder) == false)
             {
                 //BackgroundTasks.RunClass.FirstGetJsonAsync();
-                string jsonText = BackgroundTasks.RunClass.GetAndSaveJson();
+                var jsonText = BackgroundTasks.RunClass.GetAndSaveJson();
                 if (jsonText == null)
                 {
                     RegisterBackgroundTask(taskEntryPoint, taskName);
@@ -148,6 +183,7 @@ namespace _25h8.business
             
             return task;
         }
+        public Uri LandingUri = new Uri(@"https://stage.25h8.business/#!/landing");
         static readonly StorageFolder GetLocalFolder = ApplicationData.Current.LocalFolder;
         static readonly string PathFolder = Path.Combine(GetLocalFolder.Path, "data.json");
         private const string taskName = "RunClass";

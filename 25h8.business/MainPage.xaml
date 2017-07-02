@@ -8,7 +8,7 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" VerticalAlignment="Center" HorizontalAlignment="Center">
-        <TextBlock HorizontalAlignment="Center" Margin="0" TextWrapping="Wrap" Text="Please wait..." VerticalAlignment="Center" FontSize="24"/>
+        <TextBlock x:Name="DisplayResult" HorizontalAlignment="Center" Margin="0" TextWrapping="Wrap" Text="" VerticalAlignment="Center" FontSize="22" IsDoubleTapEnabled="False" IsRightTapEnabled="False" IsHoldingEnabled="False" IsTapEnabled="False"/>
 
 
 
