@@ -60,11 +60,11 @@ namespace BackgroundTasks
                             {
                                 Source = background
                             },
-                            PeekImage = new TilePeekImage()
-                            {
-                                Source = logoURL,
-                                HintOverlay = 20
-                            },
+                            //PeekImage = new TilePeekImage()
+                            //{
+                            //    Source = logoURL,
+                            //    HintOverlay = 20
+                            //},
                             Children =
                             {
                                 new AdaptiveText()

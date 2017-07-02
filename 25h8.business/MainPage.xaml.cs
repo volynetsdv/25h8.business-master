@@ -28,16 +28,7 @@ namespace _25h8.business
             ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(300, 130));
             ApplicationView.PreferredLaunchViewSize = new Size(300, 130);
             ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
-
-
-
-            //Application.Current.Exit(); //команда завершения работы приложенияю В теории фоновая задача 
-            //должна проходить регистрацию (процес на столько быстр, что без брикпоинтов пользователь 
-            //практически ничего не заметит) и после - завершаться. Тем не менее отдельный фоновый процесс после регистрации
-            //будет оставаться активным. Так же есть более эффективная альтернатива: https://docs.microsoft.com/en-us/uwp/api/Windows.ApplicationModel.Core.CoreApplication#Windows_ApplicationModel_Core_CoreApplication_EnteredBackground 
-
         }
-
 
         //этот и ниже метод вместе с манифестом(раздел Объявления - точка входа) запускают фоновую службу. 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -88,17 +79,19 @@ namespace _25h8.business
             if (isSupported)
             {
                 // And pin it to Start
+                //Обнаружил проблему при отключенном интернете. По не ясной мне причине 
+                //програма не дожидается ответа пользователя и идет дальше по коду, что приводит 
+                //к завершению программы до того, как пользователь поймет чего от него хотят
                 bool pinnIfExist = await StartScreenManager.GetDefault().RequestAddAppListEntryAsync(entry);
-
+               
                 DisplayResult.Text = "Плитка успешно закреплена в меню Пуск";
                 await Task.Delay(1900);
                 Application.Current.Exit();
             }
             else
             {
-                //добавить условие else, то есть, "если програмное закреполение не поддерживается"
-                //вывести сообщение "Пожалуйста, закрепите плитку в меню Пуск"
-                //временная заглушка:
+                //требует тестирования:
+
                 DisplayResult.Text = "Пожалуйста, закрепите плитку в меню Пуск";
                 await Task.Delay(1500);
                 DisplayResult.Text = "Перенаправляю на сайт";
@@ -123,7 +116,7 @@ namespace _25h8.business
         {
             if (File.Exists(PathFolder) == false)
             {
-                //BackgroundTasks.RunClass.FirstGetJsonAsync();
+                
                 var jsonText = BackgroundTasks.RunClass.GetAndSaveJson();
                 if (jsonText == null)
                 {
@@ -141,13 +134,11 @@ namespace _25h8.business
             
         }
         //
-        // Register a background task with the specified taskEntryPoint, name, trigger,
-        // and condition (optional).
+        // Register a background task with the specified taskEntryPoint, name, trigger
         //
         // taskEntryPoint: Task entry point for the background task.
         // taskName: A name for the background task.
         // trigger: The trigger for the background task.
-        // condition: Optional parameter. A conditional event that must be true for the task to fire.
         //
         public static BackgroundTaskRegistration RegisterBackgroundTask(string taskEntryPoint,
             string taskName)
