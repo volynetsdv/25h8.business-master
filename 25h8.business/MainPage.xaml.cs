@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.Http;
 using Windows.UI.Xaml.Controls;
 using Windows.ApplicationModel.Background;
 using Windows.UI.Xaml.Navigation;
@@ -47,28 +48,16 @@ namespace _25h8.business
             bool isSupported = StartScreenManager.GetDefault().SupportsAppListEntry(entry);
             // Check if your app is currently pinned
             bool isPinned = await StartScreenManager.GetDefault().ContainsAppListEntryAsync(entry);
-        //если да - перейти на сайт
-
+        
         if (isPinned)
         {
-            //var success = GoToLanding();
-            var success = await GoToLanding();
-                if (success == false)
-                {
-                    DisplayResult.Text = "Проверьте соединение";
-                    await Task.Delay(2000);
-                    Application.Current.Exit();                
-                }
-                Application.Current.Exit();
+            await GoToLanding();
         }
 
-        //если нет и поддерживается програмное закрепление плитки - спросить пользователя
+            // If tile isn't pinned and app can do it - send request to user
             if (isSupported)
             {
                 // And pin it to Start
-                //Обнаружил проблему при отключенном интернете. По не ясной мне причине 
-                //програма не дожидается ответа пользователя и идет дальше по коду, что приводит 
-                //к завершению программы до того, как пользователь поймет чего от него хотят
                 var tileState = await StartScreenManager.GetDefault().RequestAddAppListEntryAsync(entry);
                 if (tileState)
                 {
@@ -76,41 +65,24 @@ namespace _25h8.business
                     await Task.Delay(1900);
                     Application.Current.Exit();
                 }
+                //возможно этот блок можна убрать:
                 else
                 {
                     DisplayResult.Text = "Пожалуйста, закрепите плитку в меню Пуск";
                     await Task.Delay(2300);
-                    var success = await GoToLanding();
-                    if (success == false)
-                    {
-                        DisplayResult.Text = "Проверьте соединение";
-                        await Task.Delay(1400);
-                        Application.Current.Exit();
-                        // URI launch failed
-                    }
-                    Application.Current.Exit();
+                    await GoToLanding();
                 }
             }
+            // Send mesage if app can't pin tile to Start (and maybe if user has rejected request)
             else
             {
-                //требует тестирования:
-
+                //will have to testing:
                 DisplayResult.Text = "Пожалуйста, закрепите плитку в меню Пуск";
-                await Task.Delay(1900);
-                DisplayResult.Text = "Перенаправляю на сайт";
-                var success = await GoToLanding();
-                if (success == false)
-                {
-                    DisplayResult.Text = "Проверьте соединение";
-                    await Task.Delay(1400);
-                    Application.Current.Exit();
-                    // URI launch failed
-                }
-                Application.Current.Exit();
+                await GoToLanding();
             }
 
         }
-
+        // for firstly tile updating ufter installetion
         private void FirstRun()
         {
             if (File.Exists(PathFolder) == false)
@@ -175,20 +147,49 @@ namespace _25h8.business
         }
 
         
-        public async Task<bool> GoToLanding()
+        public async Task GoToLanding()
         {
             DisplayResult.Text = "Перенаправляю на сайт...";
-            await Task.Delay(1900);
-            // Launch the URI            
-            var result = await Windows.System.Launcher.LaunchUriAsync(LandingUri);
-            
-            return result;
+            InternetChecker();
+
+            await Task.Delay(2000);
+            if (_internetChecker)
+            {
+                await Windows.System.Launcher.LaunchUriAsync(LandingUri);
+                Application.Current.Exit();
+            }
+            else
+            {
+                DisplayResult.Text = "Проверьте соединение";
+                await Task.Delay(2500);
+                Application.Current.Exit();
+            }
         }
+        //Check Internet connection
+        private bool InternetChecker()
+        {
+            using (var httpClient = new HttpClient())
+            {
+                try
+                {
+                    HttpResponseMessage response = httpClient.GetAsync(new Uri(@"https://www.google.com.ua/"))
+                        .GetAwaiter().GetResult();
+                    return _internetChecker = true;
+                }
+                catch (Exception)
+                {
+                    return _internetChecker = false;
+                }
+            }
+        }
+
         public Uri LandingUri = new Uri(@"https://stage.25h8.business/#!/landing");
         static readonly StorageFolder GetLocalFolder = ApplicationData.Current.LocalFolder;
         static readonly string PathFolder = Path.Combine(GetLocalFolder.Path, "data.json");
         private const string taskName = "RunClass";
         private const string taskEntryPoint = "BackgroundTasks.RunClass";
-        
+        private bool _internetChecker;
+
+
     }
 }
