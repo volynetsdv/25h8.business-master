@@ -32,22 +32,12 @@ namespace _25h8.business
 
         //этот и ниже метод вместе с манифестом(раздел Объявления - точка входа) запускают фоновую службу. 
         protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
-            
+        {            
             FirstRun();
             RegisterBackgroundTask(taskEntryPoint, taskName);
             PinFirstTile();
         }
 
-        public async Task<bool> GoToLanding()
-        {
-            DisplayResult.Text = "Перенаправляю на сайт...";
-            await Task.Delay(1900);
-            // Launch the URI            
-            var success = await Windows.System.Launcher.LaunchUriAsync(LandingUri);
-            return success;
-
-        }
         //pin primary tile to Start if system can do it or primary tile existing
         private async void PinFirstTile()
         {
@@ -55,26 +45,23 @@ namespace _25h8.business
             AppListEntry entry = (await Package.Current.GetAppListEntriesAsync())[0];
             // Check if Start supports your app
             bool isSupported = StartScreenManager.GetDefault().SupportsAppListEntry(entry);
-            //проверяем закреплена ли плитка
+            // Check if your app is currently pinned
             bool isPinned = await StartScreenManager.GetDefault().ContainsAppListEntryAsync(entry);
         //если да - перейти на сайт
 
         if (isPinned)
         {
+            //var success = GoToLanding();
             var success = await GoToLanding();
-            if (success)
-            {
-                // URI launched
-            }
-            else
-            {
-                DisplayResult.Text = "Проверьте соединение";
-                await Task.Delay(1400);
-                Application.Current.Exit();
-                // URI launch failed
-            }
+                if (success == false)
+                {
+                    DisplayResult.Text = "Проверьте соединение";
+                    await Task.Delay(2000);
+                    Application.Current.Exit();                
+                }
                 Application.Current.Exit();
         }
+
         //если нет и поддерживается програмное закрепление плитки - спросить пользователя
             if (isSupported)
             {
@@ -82,25 +69,37 @@ namespace _25h8.business
                 //Обнаружил проблему при отключенном интернете. По не ясной мне причине 
                 //програма не дожидается ответа пользователя и идет дальше по коду, что приводит 
                 //к завершению программы до того, как пользователь поймет чего от него хотят
-                bool pinnIfExist = await StartScreenManager.GetDefault().RequestAddAppListEntryAsync(entry);
-               
-                DisplayResult.Text = "Плитка успешно закреплена в меню Пуск";
-                await Task.Delay(1900);
-                Application.Current.Exit();
+                var tileState = await StartScreenManager.GetDefault().RequestAddAppListEntryAsync(entry);
+                if (tileState)
+                {
+                    DisplayResult.Text = "Плитка успешно закреплена в меню Пуск";
+                    await Task.Delay(1900);
+                    Application.Current.Exit();
+                }
+                else
+                {
+                    DisplayResult.Text = "Пожалуйста, закрепите плитку в меню Пуск";
+                    await Task.Delay(2300);
+                    var success = await GoToLanding();
+                    if (success == false)
+                    {
+                        DisplayResult.Text = "Проверьте соединение";
+                        await Task.Delay(1400);
+                        Application.Current.Exit();
+                        // URI launch failed
+                    }
+                    Application.Current.Exit();
+                }
             }
             else
             {
                 //требует тестирования:
 
                 DisplayResult.Text = "Пожалуйста, закрепите плитку в меню Пуск";
-                await Task.Delay(1500);
+                await Task.Delay(1900);
                 DisplayResult.Text = "Перенаправляю на сайт";
                 var success = await GoToLanding();
-                if (success)
-                {
-                    // URI launched
-                }
-                else
+                if (success == false)
                 {
                     DisplayResult.Text = "Проверьте соединение";
                     await Task.Delay(1400);
@@ -174,10 +173,22 @@ namespace _25h8.business
             
             return task;
         }
+
+        
+        public async Task<bool> GoToLanding()
+        {
+            DisplayResult.Text = "Перенаправляю на сайт...";
+            await Task.Delay(1900);
+            // Launch the URI            
+            var result = await Windows.System.Launcher.LaunchUriAsync(LandingUri);
+            
+            return result;
+        }
         public Uri LandingUri = new Uri(@"https://stage.25h8.business/#!/landing");
         static readonly StorageFolder GetLocalFolder = ApplicationData.Current.LocalFolder;
         static readonly string PathFolder = Path.Combine(GetLocalFolder.Path, "data.json");
         private const string taskName = "RunClass";
         private const string taskEntryPoint = "BackgroundTasks.RunClass";
+        
     }
 }
