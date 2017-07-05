@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using Windows.Web.Http.Filters;
 using Windows.Security.Cryptography.Certificates;
 using System.Text.RegularExpressions;
+using BackgroundTasks.Models;
 
 namespace BackgroundTasks
 {

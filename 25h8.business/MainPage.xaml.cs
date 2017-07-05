@@ -35,7 +35,7 @@ namespace _25h8.business
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {            
             FirstRun();
-            RegisterBackgroundTask(taskEntryPoint, taskName);
+            RegisterBackgroundTask(TaskEntryPoint, TaskName);
             PinFirstTile();
         }
 
@@ -91,7 +91,7 @@ namespace _25h8.business
                 var jsonText = BackgroundTasks.RunClass.GetAndSaveJson();
                 if (jsonText == null)
                 {
-                    RegisterBackgroundTask(taskEntryPoint, taskName);
+                    RegisterBackgroundTask(TaskEntryPoint, TaskName);
                     PinFirstTile();
                 }
                 else
@@ -186,8 +186,8 @@ namespace _25h8.business
         public Uri LandingUri = new Uri(@"https://stage.25h8.business/#!/landing");
         static readonly StorageFolder GetLocalFolder = ApplicationData.Current.LocalFolder;
         static readonly string PathFolder = Path.Combine(GetLocalFolder.Path, "data.json");
-        private const string taskName = "RunClass";
-        private const string taskEntryPoint = "BackgroundTasks.RunClass";
+        private const string TaskName = "RunClass";
+        private const string TaskEntryPoint = "BackgroundTasks.RunClass";
         private bool _internetChecker;
 
 

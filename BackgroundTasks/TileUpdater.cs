@@ -1,6 +1,7 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications;
 using Windows.UI.Notifications;
 using System.Collections.Generic;
+using BackgroundTasks.Models;
 
 namespace BackgroundTasks
 {
